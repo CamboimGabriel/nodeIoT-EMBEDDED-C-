@@ -1,10 +1,10 @@
 const express = require("express");
 const authMiddleware = require("../middlewares/auth");
 const User = require("../models/users");
-const Device = require("../models/Devices");
+const Device = require("../models/devices");
 const mqtt = require("mqtt");
 const client = require("../index.js");
-const Cenas = require("../models/Cenas");
+const Cenas = require("../models/cenas");
 
 const router = express.Router();
 
