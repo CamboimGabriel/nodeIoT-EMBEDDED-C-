@@ -5,6 +5,7 @@ const Device = require("../models/devices");
 const mqtt = require("mqtt");
 const client = require("../index.js");
 const Cenas = require("../models/cenas");
+const Alarme = require("../models/alarmes");
 
 const router = express.Router();
 
@@ -180,6 +181,81 @@ router.get("/:id/scenes", async (req, res) => {
     const test = await Cenas.find({ userID: req.params.id });
 
     res.send(test);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send({ error: "error" });
+  }
+});
+
+router.post("/:id/alarms/create/:name", async (req, res) => {
+  console.log(req.body);
+  try {
+    if (!(await User.findOne({ _id: req.params.id })))
+      return res.status(400).send({ error: "id not found" });
+
+    const alarme = await Alarme.create({
+      userID: req.params.id,
+      name: req.params.name,
+      estado: true,
+      ...req.body
+    });
+
+    res.send(alarme);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send({ error: "error" });
+  }
+});
+
+router.post("/alarms/:idAlarme/delete", async (req, res) => {
+  try {
+    if (!(await Alarme.findOne({ _id: req.params.idAlarme })))
+      return res.status(400).send({ error: "id not found" });
+
+    const test = await Alarme.deleteOne({ _id: req.params.idAlarme }, function(
+      err
+    ) {
+      if (err) return handleError(err);
+    });
+
+    console.log(test);
+    res.send("sucess deleted");
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send({ error: "error" });
+  }
+});
+
+router.get("/:id/alarms", async (req, res) => {
+  try {
+    if (!(await User.findOne({ _id: req.params.id })))
+      return res.status(400).send({ error: "id not found" });
+
+    const test = await Alarme.find({ userID: req.params.id });
+
+    res.send(test);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send({ error: "error" });
+  }
+});
+
+router.post("/alarms/:idAlarme/:estado", async (req, res) => {
+  try {
+    if (!(await Alarme.findOne({ _id: req.params.idAlarme })))
+      return res.status(400).send({ error: "id not found" });
+
+    Alarme.updateOne(
+      { _id: req.params.idAlarme },
+      {
+        estado: req.params.estado
+      },
+      function(err) {
+        console.log(err);
+      }
+    );
+
+    res.send("sucess");
   } catch (err) {
     console.log(err);
     return res.status(400).send({ error: "error" });
