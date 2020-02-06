@@ -136,7 +136,6 @@ router.post("/devices/:deviceID/shadow", async (req, res) => {
 });
 
 router.post("/:id/scenes/create/:name", async (req, res) => {
-  console.log(req.body);
   try {
     if (!(await User.findOne({ _id: req.params.id })))
       return res.status(400).send({ error: "id not found" });
@@ -165,7 +164,6 @@ router.post("/scenes/:idCena/delete", async (req, res) => {
       if (err) return handleError(err);
     });
 
-    console.log(test);
     res.send("sucess deleted");
   } catch (err) {
     console.log(err);
@@ -188,7 +186,6 @@ router.get("/:id/scenes", async (req, res) => {
 });
 
 router.post("/:id/alarms/create/:name", async (req, res) => {
-  console.log(req.body);
   try {
     if (!(await User.findOne({ _id: req.params.id })))
       return res.status(400).send({ error: "id not found" });
@@ -199,6 +196,11 @@ router.post("/:id/alarms/create/:name", async (req, res) => {
       estado: true,
       ...req.body
     });
+
+    client.client.publish(
+      req.params.id.toString() + "/sincroniza",
+      JSON.stringify(alarme)
+    );
 
     res.send(alarme);
   } catch (err) {
